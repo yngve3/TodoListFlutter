@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:untitled/bloc/todo_bloc.dart';
+import 'package:untitled/cubit/todo_cubit.dart';
 
 import 'Todo.dart';
 
@@ -27,14 +27,14 @@ class TodoListItem extends StatelessWidget {
         style: _getTextStyle(context),
       ),
       onChanged: (newValue) {
-        context.read<TodoBloc>().add(TodoCompletedPressed(todo));
+        context.read<TodoCubit>().changeTodoCompleteness(todo);
       },
       value: todo.isCompleted,
       controlAffinity: ListTileControlAffinity.leading,
       secondary: IconButton(
         icon: const Icon(Icons.close),
         onPressed: () {
-          context.read<TodoBloc>().add(TodoDeletePressed(todo));
+          context.read<TodoCubit>().deleteTodo(todo);
         },
       ),
     );
@@ -84,7 +84,7 @@ class _TodoCreateState extends State<TodoCreate> {
     return TextField(
       controller: _controller,
       onSubmitted: (String value) {
-        context.read<TodoBloc>().add(TodoCreatePressed(Todo(value)));
+        context.read<TodoCubit>().createTodo(Todo(value));
         _controller.clear();
       },
     );
@@ -100,7 +100,7 @@ class TodoApp extends StatelessWidget {
         appBar: AppBar(
           title: const Text("Todo list"),
         ),
-        body: BlocBuilder<TodoBloc, TodoState> (
+        body: BlocBuilder<TodoCubit, TodoState> (
             builder: (context, state) {
               return SingleChildScrollView(
                   child: Column(
@@ -126,7 +126,7 @@ void main() {
   runApp(MaterialApp(
     title: 'Todo list',
     home: BlocProvider(
-      create: (_) => TodoBloc(),
+      create: (_) => TodoCubit(),
       child: const TodoApp(),
     ),
   ));
