@@ -1,27 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:untitled/bloc/todo_bloc.dart';
 
-class Todo {
-  Todo({required this.name});
+import 'Todo.dart';
 
-  final String name;
-  bool isCompleted = false;
-}
-
-typedef TodoCompleteCallback = Function(Todo todo);
-typedef TodoCreateCallback = Function(String name);
-typedef TodoDeleteCallback = Function(Todo todo);
-
-class TodoListItem extends StatefulWidget {
-  const TodoListItem(
-      {super.key,
-      required this.todo,
-      required this.onTodoComplete,
-      required this.onTodoDelete});
+class TodoListItem extends StatelessWidget {
+  const TodoListItem({super.key, required this.todo});
 
   final Todo todo;
-  final TodoCompleteCallback onTodoComplete;
-  final TodoDeleteCallback onTodoDelete;
 
   TextStyle? _getTextStyle(BuildContext context) {
     if (!todo.isCompleted) return null;
@@ -33,27 +19,22 @@ class TodoListItem extends StatefulWidget {
   }
 
   @override
-  State<StatefulWidget> createState() => _TodoListItemState();
-}
-
-class _TodoListItemState extends State<TodoListItem> {
-  @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(
-        widget.todo.name,
-        style: widget._getTextStyle(context),
+        todo.text,
+        style: _getTextStyle(context),
       ),
       onChanged: (newValue) {
-        widget.onTodoComplete(widget.todo);
+        context.read<TodoBloc>().add(TodoCompletedPressed(todo));
       },
-      value: widget.todo.isCompleted,
+      value: todo.isCompleted,
       controlAffinity: ListTileControlAffinity.leading,
       secondary: IconButton(
         icon: const Icon(Icons.close),
         onPressed: () {
-          widget.onTodoDelete(widget.todo);
+          context.read<TodoBloc>().add(TodoDeletePressed(todo));
         },
       ),
     );
@@ -61,34 +42,23 @@ class _TodoListItemState extends State<TodoListItem> {
 }
 
 class TodoList extends StatelessWidget {
-  const TodoList(
-      {super.key,
-      required this.todos,
-      required this.onTodoComplete,
-      required this.onTodoDelete});
+  const TodoList({super.key, required this.todos});
 
   final List<Todo> todos;
-  final TodoCompleteCallback onTodoComplete;
-  final TodoDeleteCallback onTodoDelete;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       verticalDirection: VerticalDirection.up,
       children: todos.map((todo) {
-        return TodoListItem(
-            todo: todo,
-            onTodoComplete: onTodoComplete,
-            onTodoDelete: onTodoDelete);
+        return TodoListItem(todo: todo);
       }).toList(),
     );
   }
 }
 
 class TodoCreate extends StatefulWidget {
-  const TodoCreate({super.key, required this.onTodoCreate});
-
-  final TodoCreateCallback onTodoCreate;
+  const TodoCreate({super.key});
 
   @override
   State<StatefulWidget> createState() => _TodoCreateState();
@@ -114,40 +84,15 @@ class _TodoCreateState extends State<TodoCreate> {
     return TextField(
       controller: _controller,
       onSubmitted: (String value) {
-        widget.onTodoCreate(value);
+        context.read<TodoBloc>().add(TodoCreatePressed(Todo(value)));
         _controller.clear();
       },
     );
   }
 }
 
-class TodoApp extends StatefulWidget {
+class TodoApp extends StatelessWidget {
   const TodoApp({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _TodoAppState();
-}
-
-class _TodoAppState extends State<TodoApp> {
-  final List<Todo> todos = [];
-
-  void _handleTodoCompleted(Todo todo) {
-    setState(() {
-      todo.isCompleted = !todo.isCompleted;
-    });
-  }
-
-  void _handleTodoCreate(String name) {
-    setState(() {
-      todos.add(Todo(name: name));
-    });
-  }
-
-  void _handleTodoDelete(Todo todo) {
-    setState(() {
-      todos.remove(todo);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,31 +100,34 @@ class _TodoAppState extends State<TodoApp> {
         appBar: AppBar(
           title: const Text("Todo list"),
         ),
-        body: SingleChildScrollView(
-            child: Column(
-              children: [
-                TodoCreate(onTodoCreate: _handleTodoCreate),
-                TodoList(
-                  todos: todos.where((todo) => !todo.isCompleted).toList(),
-                  onTodoComplete: _handleTodoCompleted,
-                  onTodoDelete: _handleTodoDelete,
-                ),
-                const Divider(),
-                TodoList(
-                  todos: todos.where((todo) => todo.isCompleted).toList(),
-                  onTodoComplete: _handleTodoCompleted,
-                  onTodoDelete: _handleTodoDelete,
-                )
-              ],
-            )
+        body: BlocBuilder<TodoBloc, TodoState> (
+            builder: (context, state) {
+              return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const TodoCreate(),
+                      TodoList(
+                        todos: state.todos.where((todo) => !todo.isCompleted).toList(),
+                      ),
+                      const Divider(),
+                      TodoList(
+                        todos: state.todos.where((todo) => todo.isCompleted).toList(),
+                      )
+                    ],
+                  )
+              );
+            }
         )
     );
   }
 }
 
 void main() {
-  runApp(const MaterialApp(
+  runApp(MaterialApp(
     title: 'Todo list',
-    home: TodoApp(),
+    home: BlocProvider(
+      create: (_) => TodoBloc(),
+      child: const TodoApp(),
+    ),
   ));
 }
