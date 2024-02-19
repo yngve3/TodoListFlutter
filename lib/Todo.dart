@@ -1,6 +1,11 @@
-class Todo {
-  Todo(this.text);
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/foundation.dart';
+part 'Todo.freezed.dart';
 
-  final String text;
-  bool isCompleted = false;
+@unfreezed
+class Todo with _$Todo {
+  factory Todo({
+    required final String text,
+    @Default(false) bool isCompleted
+  }) = _Todo;
 }

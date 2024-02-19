@@ -84,7 +84,7 @@ class _TodoCreateState extends State<TodoCreate> {
     return TextField(
       controller: _controller,
       onSubmitted: (String value) {
-        context.read<TodoCubit>().createTodo(Todo(value));
+        context.read<TodoCubit>().createTodo(Todo(text: value));
         _controller.clear();
       },
     );
