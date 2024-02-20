@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'Todo.dart';
+part of 'todo.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -18,7 +18,6 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$Todo {
   String get text => throw _privateConstructorUsedError;
   bool get isCompleted => throw _privateConstructorUsedError;
-  set isCompleted(bool value) => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $TodoCopyWith<Todo> get copyWith => throw _privateConstructorUsedError;
@@ -106,7 +105,7 @@ class _$TodoImpl with DiagnosticableTreeMixin implements _Todo {
   final String text;
   @override
   @JsonKey()
-  bool isCompleted;
+  final bool isCompleted;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -122,6 +121,19 @@ class _$TodoImpl with DiagnosticableTreeMixin implements _Todo {
       ..add(DiagnosticsProperty('isCompleted', isCompleted));
   }
 
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TodoImpl &&
+            (identical(other.text, text) || other.text == text) &&
+            (identical(other.isCompleted, isCompleted) ||
+                other.isCompleted == isCompleted));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, text, isCompleted);
+
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
@@ -130,13 +142,13 @@ class _$TodoImpl with DiagnosticableTreeMixin implements _Todo {
 }
 
 abstract class _Todo implements Todo {
-  factory _Todo({required final String text, bool isCompleted}) = _$TodoImpl;
+  factory _Todo({required final String text, final bool isCompleted}) =
+      _$TodoImpl;
 
   @override
   String get text;
   @override
   bool get isCompleted;
-  set isCompleted(bool value);
   @override
   @JsonKey(ignore: true)
   _$$TodoImplCopyWith<_$TodoImpl> get copyWith =>

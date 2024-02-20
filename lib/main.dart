@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:untitled/cubit/todo_cubit.dart';
-
-import 'Todo.dart';
+import 'package:untitled/todos/cubit/todo_cubit.dart';
+import 'package:untitled/todos/cubit/todo_state.dart';
+import 'package:untitled/todos/models/todo.dart';
 
 class TodoListItem extends StatelessWidget {
   const TodoListItem({super.key, required this.todo});
