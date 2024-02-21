@@ -7,19 +7,19 @@ class TodoCubit extends Cubit<TodoState> {
 
   void createTodo(Todo todo) {
     emit(TodoState(
-        todos: List.of(state.todos)..add(todo))
+        todos: [...state.todos, todo])
     );
   }
 
   void deleteTodo(Todo todo) {
     emit(TodoState(
-        todos: List.of(state.todos)..remove(todo))
+        todos: [...state.todos]..remove(todo))
     );
   }
 
   void changeTodoCompleteness(Todo todo) {
     final Todo changedTodo = todo.copyWith(isCompleted: !todo.isCompleted);
-    List<Todo> list = List.of(state.todos);
+    List<Todo> list = [...state.todos];
     list[list.indexOf(todo)] = changedTodo;
     emit(TodoState(todos: list));
   }
